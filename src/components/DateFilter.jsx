@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { Calendar, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Popover,
@@ -14,17 +13,25 @@ import { format } from "date-fns";
 
 const DateFilter = ({ dateRange, onDateRangeChange }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [tempDateRange, setTempDateRange] = useState(dateRange);
 
   const handleDateSelect = (date, type) => {
     if (type === 'from') {
-      onDateRangeChange({ ...dateRange, from: date });
+      setTempDateRange({ ...tempDateRange, from: date });
     } else {
-      onDateRangeChange({ ...dateRange, to: date });
+      setTempDateRange({ ...tempDateRange, to: date });
     }
   };
 
+  const applyFilter = () => {
+    onDateRangeChange(tempDateRange);
+    setIsOpen(false);
+  };
+
   const clearDateRange = () => {
-    onDateRangeChange({ from: null, to: null });
+    const clearedRange = { from: null, to: null };
+    setTempDateRange(clearedRange);
+    onDateRangeChange(clearedRange);
   };
 
   const hasDateFilter = dateRange.from || dateRange.to;
@@ -47,7 +54,7 @@ const DateFilter = ({ dateRange, onDateRangeChange }) => {
                   <div className="mt-1">
                     <CalendarComponent
                       mode="single"
-                      selected={dateRange.from}
+                      selected={tempDateRange.from}
                       onSelect={(date) => handleDateSelect(date, 'from')}
                       className="rounded-md border"
                     />
@@ -58,14 +65,14 @@ const DateFilter = ({ dateRange, onDateRangeChange }) => {
                   <div className="mt-1">
                     <CalendarComponent
                       mode="single"
-                      selected={dateRange.to}
+                      selected={tempDateRange.to}
                       onSelect={(date) => handleDateSelect(date, 'to')}
                       className="rounded-md border"
-                      disabled={(date) => dateRange.from && date < dateRange.from}
+                      disabled={(date) => tempDateRange.from && date < tempDateRange.from}
                     />
                   </div>
                 </div>
-                <Button onClick={() => setIsOpen(false)} className="w-full">
+                <Button onClick={applyFilter} className="w-full">
                   Apply Filter
                 </Button>
               </div>

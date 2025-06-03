@@ -1,5 +1,4 @@
-
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import VideoCard from "./VideoCard";
 import SearchBar from "./SearchBar";
@@ -67,7 +66,7 @@ const VideoGrid = ({ channelId, maxResults }) => {
     enabled: !!channelId,
   });
 
-  // Filter and search videos
+  // Filter and search videos with debounce
   const filteredVideos = useMemo(() => {
     if (!videos) return [];
 
@@ -111,7 +110,7 @@ const VideoGrid = ({ channelId, maxResults }) => {
   const currentVideos = filteredVideos.slice(startIndex, endIndex);
 
   // Reset to first page when filters change
-  useState(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, dateRange]);
 
@@ -194,19 +193,18 @@ const VideoGrid = ({ channelId, maxResults }) => {
             ))}
           </div>
 
-          {/* Pagination */}
+          {/* Fixed Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center">
+            <div className="flex justify-center mt-8">
               <Pagination>
-                <PaginationContent>
+                <PaginationContent className="flex items-center gap-1">
                   <PaginationItem>
                     <PaginationPrevious 
-                      href="#"
                       onClick={(e) => {
                         e.preventDefault();
                         if (currentPage > 1) handlePageChange(currentPage - 1);
                       }}
-                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                      className={`cursor-pointer ${currentPage === 1 ? "pointer-events-none opacity-50" : ""}`}
                     />
                   </PaginationItem>
                   
@@ -225,12 +223,12 @@ const VideoGrid = ({ channelId, maxResults }) => {
                     return (
                       <PaginationItem key={pageNum}>
                         <PaginationLink
-                          href="#"
                           onClick={(e) => {
                             e.preventDefault();
                             handlePageChange(pageNum);
                           }}
                           isActive={currentPage === pageNum}
+                          className="cursor-pointer min-w-[40px] h-10 flex items-center justify-center"
                         >
                           {pageNum}
                         </PaginationLink>
@@ -240,12 +238,11 @@ const VideoGrid = ({ channelId, maxResults }) => {
                   
                   <PaginationItem>
                     <PaginationNext 
-                      href="#"
                       onClick={(e) => {
                         e.preventDefault();
                         if (currentPage < totalPages) handlePageChange(currentPage + 1);
                       }}
-                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                      className={`cursor-pointer ${currentPage === totalPages ? "pointer-events-none opacity-50" : ""}`}
                     />
                   </PaginationItem>
                 </PaginationContent>

@@ -10,7 +10,7 @@ const SearchBar = ({ searchTerm, onSearchChange }) => {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       onSearchChange(localSearch);
-    }, 300);
+    }, 500); // 500ms debounce delay
 
     return () => clearTimeout(timeoutId);
   }, [localSearch, onSearchChange]);
