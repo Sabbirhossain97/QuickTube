@@ -1,19 +1,13 @@
+
 import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import VideoCard from "./VideoCard";
-import SearchBar from "./SearchBar";
-import DateFilter from "./DateFilter";
+import VideoFilters from "./VideoFilters";
+import VideoStats from "./VideoStats";
+import VideoList from "./VideoList";
+import VideoPagination from "./VideoPagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 
 const API_KEY = "AIzaSyCJWTCNvoP3QfPQHyw1DqaFiStxP8ws__U";
 const ITEMS_PER_PAGE = 12;
@@ -163,101 +157,27 @@ const VideoGrid = ({ channelId, maxResults }) => {
 
   return (
     <div className="space-y-6">
-      {/* Search and Filter Controls */}
-      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-        <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
-        <DateFilter dateRange={dateRange} onDateRangeChange={setDateRange} />
-      </div>
+      <VideoFilters 
+        searchTerm={searchTerm} 
+        onSearchChange={setSearchTerm}
+        dateRange={dateRange}
+        onDateRangeChange={setDateRange}
+      />
 
-      {/* Results Summary */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold text-foreground">
-          {filteredVideos.length === videos.length 
-            ? `Latest Videos (${filteredVideos.length})`
-            : `Filtered Videos (${filteredVideos.length} of ${videos.length})`
-          }
-        </h2>
-        {totalPages > 1 && (
-          <p className="text-sm text-muted-foreground">
-            Page {currentPage} of {totalPages}
-          </p>
-        )}
-      </div>
+      <VideoStats 
+        filteredCount={filteredVideos.length}
+        totalCount={videos.length}
+        currentPage={currentPage}
+        totalPages={totalPages}
+      />
       
-      {/* Video Grid */}
-      {currentVideos.length > 0 ? (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {currentVideos.map((video) => (
-              <VideoCard key={video.id} video={video} />
-            ))}
-          </div>
+      <VideoList videos={currentVideos} />
 
-          {/* Fixed Pagination */}
-          {totalPages > 1 && (
-            <div className="flex justify-center mt-8">
-              <Pagination>
-                <PaginationContent className="flex items-center gap-1">
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (currentPage > 1) handlePageChange(currentPage - 1);
-                      }}
-                      className={`cursor-pointer ${currentPage === 1 ? "pointer-events-none opacity-50" : ""}`}
-                    />
-                  </PaginationItem>
-                  
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-                    
-                    return (
-                      <PaginationItem key={pageNum}>
-                        <PaginationLink
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handlePageChange(pageNum);
-                          }}
-                          isActive={currentPage === pageNum}
-                          className="cursor-pointer min-w-[40px] h-10 flex items-center justify-center"
-                        >
-                          {pageNum}
-                        </PaginationLink>
-                      </PaginationItem>
-                    );
-                  })}
-                  
-                  <PaginationItem>
-                    <PaginationNext 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (currentPage < totalPages) handlePageChange(currentPage + 1);
-                      }}
-                      className={`cursor-pointer ${currentPage === totalPages ? "pointer-events-none opacity-50" : ""}`}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          )}
-        </>
-      ) : (
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            No videos found matching your search criteria. Try adjusting your filters.
-          </AlertDescription>
-        </Alert>
-      )}
+      <VideoPagination 
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 };
