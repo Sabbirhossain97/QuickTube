@@ -14,7 +14,6 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const [channelId, setChannelId] = useState("");
-  const [maxResults, setMaxResults] = useState(25);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -38,14 +37,11 @@ const App = () => {
                 <ChannelInput 
                   channelId={channelId}
                   setChannelId={setChannelId}
-                  maxResults={maxResults}
-                  setMaxResults={setMaxResults}
                 />
                 
                 {channelId && (
                   <VideoGrid 
-                    channelId={channelId} 
-                    maxResults={maxResults}
+                    channelId={channelId}
                   />
                 )}
               </div>

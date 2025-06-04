@@ -4,15 +4,8 @@ import { Search, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-const ChannelInput = ({ channelId, setChannelId, maxResults, setMaxResults }) => {
+const ChannelInput = ({ channelId, setChannelId }) => {
   const [inputValue, setInputValue] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
@@ -57,27 +50,6 @@ const ChannelInput = ({ channelId, setChannelId, maxResults, setMaxResults }) =>
                 </>
               )}
             </Button>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <label className="text-sm font-medium text-foreground">
-              Max Results:
-            </label>
-            <Select 
-              value={maxResults.toString()} 
-              onValueChange={(value) => setMaxResults(parseInt(value))}
-              disabled={isSearching}
-            >
-              <SelectTrigger className="w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </form>
       </CardContent>
