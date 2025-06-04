@@ -8,7 +8,7 @@ import VideoPagination from "./VideoPagination";
 import ChannelInfo from "./ChannelInfo";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 
 const API_KEY = "AIzaSyCJWTCNvoP3QfPQHyw1DqaFiStxP8ws__U";
 const ITEMS_PER_PAGE = 12;
@@ -17,6 +17,8 @@ const VideoGrid = ({ channelId, maxResults }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dateRange, setDateRange] = useState({ from: null, to: null });
   const [currentPage, setCurrentPage] = useState(1);
+  const [isFiltering, setIsFiltering] = useState(false);
+  const [isPaginating, setIsPaginating] = useState(false);
 
   const fetchChannelData = async () => {
     console.log("Fetching channel details for:", channelId);
@@ -113,20 +115,37 @@ const VideoGrid = ({ channelId, maxResults }) => {
 
   // Reset to first page when filters change
   useEffect(() => {
+    if (searchTerm || dateRange.from || dateRange.to) {
+      setIsFiltering(true);
+      const timer = setTimeout(() => {
+        setIsFiltering(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [searchTerm, dateRange]);
+
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, dateRange]);
 
   const handlePageChange = (page) => {
+    setIsPaginating(true);
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    setTimeout(() => {
+      setIsPaginating(false);
+    }, 300);
   };
 
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-10 w-32" />
+        <div className="flex items-center justify-center py-8">
+          <div className="flex flex-col items-center space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-lg font-medium text-muted-foreground">Loading channel data...</p>
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, index) => (
@@ -181,7 +200,18 @@ const VideoGrid = ({ channelId, maxResults }) => {
         totalPages={totalPages}
       />
       
-      <VideoList videos={currentVideos} />
+      {isFiltering || isPaginating ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center space-y-4">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">
+              {isFiltering ? "Filtering videos..." : "Loading page..."}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <VideoList videos={currentVideos} />
+      )}
 
       <VideoPagination 
         currentPage={currentPage}

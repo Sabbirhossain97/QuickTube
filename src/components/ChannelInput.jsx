@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,11 +14,18 @@ import {
 
 const ChannelInput = ({ channelId, setChannelId, maxResults, setMaxResults }) => {
   const [inputValue, setInputValue] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (inputValue.trim()) {
+      setIsSearching(true);
       setChannelId(inputValue.trim());
+      
+      // Reset loading state after a short delay
+      setTimeout(() => {
+        setIsSearching(false);
+      }, 1000);
     }
   };
 
@@ -34,11 +41,21 @@ const ChannelInput = ({ channelId, setChannelId, maxResults, setMaxResults }) =>
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 className="w-full"
+                disabled={isSearching}
               />
             </div>
-            <Button type="submit" className="px-6">
-              <Search className="h-4 w-4 mr-2" />
-              Search
+            <Button type="submit" className="px-6" disabled={isSearching}>
+              {isSearching ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Searching...
+                </>
+              ) : (
+                <>
+                  <Search className="h-4 w-4 mr-2" />
+                  Search
+                </>
+              )}
             </Button>
           </div>
           
@@ -49,6 +66,7 @@ const ChannelInput = ({ channelId, setChannelId, maxResults, setMaxResults }) =>
             <Select 
               value={maxResults.toString()} 
               onValueChange={(value) => setMaxResults(parseInt(value))}
+              disabled={isSearching}
             >
               <SelectTrigger className="w-32">
                 <SelectValue />
