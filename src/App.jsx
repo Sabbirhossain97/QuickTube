@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Header from "./components/Header";
 import ChannelInput from "./components/ChannelInput";
 import VideoGrid from "./components/VideoGrid";
+import Footer from "./components/Footer";
 import { ThemeProvider } from "./components/ThemeProvider";
 
 const queryClient = new QueryClient();
@@ -21,16 +22,16 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <div className="min-h-screen bg-background">
+          <div className="min-h-screen bg-background flex flex-col">
             <Header />
-            <main className="max-w-[1280px] mx-auto px-4 py-8">
+            <main className="max-w-[1280px] mx-auto px-4 py-8 flex-1">
               <div className="space-y-8">
                 <div className="text-center space-y-4">
                   <h1 className="text-4xl font-bold text-foreground">
-                    Discover YouTube Channels
+                    QuickTube Video Browser
                   </h1>
                   <p className="text-lg text-muted-foreground">
-                    Enter a YouTube channel ID to browse all their videos
+                    Filter and browse YouTube channel videos with advanced search and date filtering
                   </p>
                 </div>
                 
@@ -49,6 +50,7 @@ const App = () => {
                 )}
               </div>
             </main>
+            <Footer />
           </div>
         </TooltipProvider>
       </ThemeProvider>
