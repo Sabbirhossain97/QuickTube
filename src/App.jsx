@@ -24,7 +24,7 @@ const App = () => {
           <Sonner />
           <div className="min-h-screen bg-background flex flex-col">
             <Header />
-            <main className="max-w-[1280px] mx-auto px-4 py-8 flex-1">
+            <main className="w-full max-w-[1280px] mx-auto px-4 py-8 flex-1">
               <div className="space-y-8">
                 <div className="text-center space-y-4">
                   <h1 className="text-4xl font-bold text-foreground">

@@ -5,6 +5,7 @@ import VideoFilters from "./VideoFilters";
 import VideoStats from "./VideoStats";
 import VideoList from "./VideoList";
 import VideoPagination from "./VideoPagination";
+import ChannelInfo from "./ChannelInfo";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -17,12 +18,12 @@ const VideoGrid = ({ channelId, maxResults }) => {
   const [dateRange, setDateRange] = useState({ from: null, to: null });
   const [currentPage, setCurrentPage] = useState(1);
 
-  const fetchChannelUploads = async () => {
+  const fetchChannelData = async () => {
     console.log("Fetching channel details for:", channelId);
     
-    // First, get the uploads playlist ID
+    // First, get the channel information including uploads playlist ID
     const channelResponse = await fetch(
-      `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}&key=${API_KEY}`
+      `https://www.googleapis.com/youtube/v3/channels?part=contentDetails,snippet,statistics&id=${channelId}&key=${API_KEY}`
     );
     
     if (!channelResponse.ok) {
@@ -36,7 +37,8 @@ const VideoGrid = ({ channelId, maxResults }) => {
       throw new Error("Channel not found");
     }
     
-    const uploadsPlaylistId = channelData.items[0].contentDetails.relatedPlaylists.uploads;
+    const channelInfo = channelData.items[0];
+    const uploadsPlaylistId = channelInfo.contentDetails.relatedPlaylists.uploads;
     console.log("Uploads playlist ID:", uploadsPlaylistId);
     
     // Then, get the videos from the uploads playlist
@@ -51,14 +53,20 @@ const VideoGrid = ({ channelId, maxResults }) => {
     const videosData = await videosResponse.json();
     console.log("Videos data:", videosData);
     
-    return videosData.items || [];
+    return {
+      channelInfo: channelInfo,
+      videos: videosData.items || []
+    };
   };
 
-  const { data: videos, isLoading, error } = useQuery({
-    queryKey: ["channelVideos", channelId, maxResults],
-    queryFn: fetchChannelUploads,
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["channelData", channelId, maxResults],
+    queryFn: fetchChannelData,
     enabled: !!channelId,
   });
+
+  const videos = data?.videos || [];
+  const channelInfo = data?.channelInfo || null;
 
   // Filter and search videos with debounce
   const filteredVideos = useMemo(() => {
@@ -157,6 +165,8 @@ const VideoGrid = ({ channelId, maxResults }) => {
 
   return (
     <div className="space-y-6">
+      {channelInfo && <ChannelInfo channelInfo={channelInfo} />}
+      
       <VideoFilters 
         searchTerm={searchTerm} 
         onSearchChange={setSearchTerm}
