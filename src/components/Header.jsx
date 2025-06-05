@@ -12,15 +12,14 @@ const Header = () => {
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="max-w-[1280px] mx-auto px-4 h-16 flex items-center justify-between">
+      <div className="max-w-[1280px] mx-auto px-4 h-10 pb-6 flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <img 
-            src="/lovable-uploads/c6b12b2a-1862-43fa-9c74-bd00bff8605f.png" 
+            src="QuickTube.png" 
             alt="QuickTube" 
-            className="h-12 w-auto"
+            className="h-16 w-auto"
           />
         </div>
-        
         <Button
           variant="ghost"
           size="icon"

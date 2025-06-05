@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -23,24 +22,24 @@ const App = () => {
           <Sonner />
           <div className="min-h-screen bg-background flex flex-col">
             <Header />
-            <main className="w-full max-w-[1280px] mx-auto px-4 py-8 flex-1">
+            <main className="w-full max-w-[1280px] mx-auto px-4 py-20 flex-1">
               <div className="space-y-8">
                 <div className="text-center space-y-4">
                   <h1 className="text-4xl font-bold text-foreground">
                     QuickTube Video Browser
                   </h1>
                   <p className="text-lg text-muted-foreground">
-                    Filter and browse YouTube channel videos with advanced search and date filtering
+                    Filter and browse YouTube channel videos quickly with advanced search and date filtering
                   </p>
                 </div>
-                
-                <ChannelInput 
+
+                <ChannelInput
                   channelId={channelId}
                   setChannelId={setChannelId}
                 />
-                
+
                 {channelId && (
-                  <VideoGrid 
+                  <VideoGrid
                     channelId={channelId}
                   />
                 )}

@@ -9,9 +9,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { format } from "date-fns";
+import { format, startOfToday } from "date-fns";
 
 const DateFilter = ({ dateRange, onDateRangeChange }) => {
+  const today = startOfToday();
   const [isOpen, setIsOpen] = useState(false);
   const [tempDateRange, setTempDateRange] = useState(dateRange);
 
@@ -35,6 +36,7 @@ const DateFilter = ({ dateRange, onDateRangeChange }) => {
   };
 
   const hasDateFilter = dateRange.from || dateRange.to;
+  console.log(dateRange)
 
   return (
     <div className="flex items-center gap-2">
@@ -45,15 +47,14 @@ const DateFilter = ({ dateRange, onDateRangeChange }) => {
             {hasDateFilter ? 'Date Range Set' : 'Filter by Date'}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="w-auto p-0" align="top" avoidCollisions={false}>
           <Card>
             <CardContent className="p-4">
-              <div className="space-y-4">
+              <div className="flex gap-4">
                 <div>
                   <label className="text-sm font-medium">From Date</label>
                   <div className="mt-1">
                     <CalendarComponent
-                      mode="single"
                       selected={tempDateRange.from}
                       onSelect={(date) => handleDateSelect(date, 'from')}
                       className="rounded-md border"
@@ -64,15 +65,19 @@ const DateFilter = ({ dateRange, onDateRangeChange }) => {
                   <label className="text-sm font-medium">To Date</label>
                   <div className="mt-1">
                     <CalendarComponent
-                      mode="single"
                       selected={tempDateRange.to}
                       onSelect={(date) => handleDateSelect(date, 'to')}
                       className="rounded-md border"
-                      disabled={(date) => tempDateRange.from && date < tempDateRange.from}
+                      disabled={(date) =>
+                        (tempDateRange.from && date < tempDateRange.from) ||
+                        date > today
+                      }
                     />
                   </div>
                 </div>
-                <Button onClick={applyFilter} className="w-full">
+              </div>
+              <div className="w-full flex justify-center">
+                <Button onClick={applyFilter} className="w-[250px] mt-4">
                   Apply Filter
                 </Button>
               </div>
@@ -80,13 +85,13 @@ const DateFilter = ({ dateRange, onDateRangeChange }) => {
           </Card>
         </PopoverContent>
       </Popover>
-      
+
       {hasDateFilter && (
         <Button variant="ghost" size="sm" onClick={clearDateRange}>
           <X className="h-4 w-4" />
         </Button>
       )}
-      
+
       {hasDateFilter && (
         <div className="text-sm text-muted-foreground">
           {dateRange.from && format(dateRange.from, 'MMM d, yyyy')}

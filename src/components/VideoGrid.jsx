@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import VideoFilters from "./VideoFilters";
@@ -10,9 +9,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Loader2 } from "lucide-react";
 
-const API_KEY = "AIzaSyCJWTCNvoP3QfPQHyw1DqaFiStxP8ws__U";
+const API_KEY = import.meta.env.VITE_API_KEY
 const MAX_RESULTS = 50;
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 20;
 
 const VideoGrid = ({ channelId }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,44 +24,36 @@ const VideoGrid = ({ channelId }) => {
   const [isLoadingMoreVideos, setIsLoadingMoreVideos] = useState(false);
 
   const fetchChannelData = async () => {
-    console.log("Fetching channel details for:", channelId);
-    
-    // First, get the channel information including uploads playlist ID
     const channelResponse = await fetch(
       `https://www.googleapis.com/youtube/v3/channels?part=contentDetails,snippet,statistics&id=${channelId}&key=${API_KEY}`
     );
-    
+
     if (!channelResponse.ok) {
       throw new Error("Failed to fetch channel information");
     }
-    
+
     const channelData = await channelResponse.json();
-    console.log("Channel data:", channelData);
-    
+
     if (!channelData.items || channelData.items.length === 0) {
       throw new Error("Channel not found");
     }
-    
+
     const channelInfo = channelData.items[0];
     const uploadsPlaylistId = channelInfo.contentDetails.relatedPlaylists.uploads;
-    console.log("Uploads playlist ID:", uploadsPlaylistId);
-    
-    // Then, get the videos from the uploads playlist
+
     const videosResponse = await fetch(
       `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=${MAX_RESULTS}&key=${API_KEY}`
     );
-    
+
     if (!videosResponse.ok) {
       throw new Error("Failed to fetch videos");
     }
-    
+
     const videosData = await videosResponse.json();
-    console.log("Videos data:", videosData);
-    
-    // Set initial videos and next page token
+
     setAllVideos(videosData.items || []);
     setNextPageToken(videosData.nextPageToken || null);
-    
+
     return {
       channelInfo: channelInfo,
       videos: videosData.items || [],
@@ -72,20 +63,18 @@ const VideoGrid = ({ channelId }) => {
 
   const fetchMoreVideos = async (pageToken, uploadsPlaylistId) => {
     setIsLoadingMoreVideos(true);
-    
+
     try {
       const videosResponse = await fetch(
         `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=${MAX_RESULTS}&pageToken=${pageToken}&key=${API_KEY}`
       );
-      
+
       if (!videosResponse.ok) {
         throw new Error("Failed to fetch more videos");
       }
-      
+
       const videosData = await videosResponse.json();
-      console.log("More videos data:", videosData);
-      
-      // Append new videos to existing ones
+
       setAllVideos(prev => [...prev, ...(videosData.items || [])]);
       setNextPageToken(videosData.nextPageToken || null);
     } catch (error) {
@@ -104,28 +93,25 @@ const VideoGrid = ({ channelId }) => {
   const channelInfo = data?.channelInfo || null;
   const uploadsPlaylistId = data?.uploadsPlaylistId || null;
 
-  // Filter and search videos with debounce
   const filteredVideos = useMemo(() => {
     if (!allVideos) return [];
 
     let filtered = allVideos;
 
-    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(video =>
         video.snippet.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // Apply date filter
     if (dateRange.from || dateRange.to) {
       filtered = filtered.filter(video => {
         const videoDate = new Date(video.snippet.publishedAt);
-        
+
         if (dateRange.from && videoDate < dateRange.from) {
           return false;
         }
-        
+
         if (dateRange.to) {
           const endOfDay = new Date(dateRange.to);
           endOfDay.setHours(23, 59, 59, 999);
@@ -133,7 +119,6 @@ const VideoGrid = ({ channelId }) => {
             return false;
           }
         }
-        
         return true;
       });
     }
@@ -141,23 +126,15 @@ const VideoGrid = ({ channelId }) => {
     return filtered;
   }, [allVideos, searchTerm, dateRange]);
 
-  // Calculate pagination
   const hasFilters = searchTerm || dateRange.from || dateRange.to;
-  
-  // For filtered results, use traditional pagination
   const filteredTotalPages = Math.ceil(filteredVideos.length / ITEMS_PER_PAGE);
-  
-  // For unfiltered results, calculate based on channel's total video count
   const totalChannelVideos = channelInfo ? parseInt(channelInfo.statistics.videoCount) : 0;
   const unfilteredTotalPages = Math.ceil(totalChannelVideos / ITEMS_PER_PAGE);
-  
   const totalPages = hasFilters ? filteredTotalPages : unfilteredTotalPages;
-  
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const currentVideos = filteredVideos.slice(startIndex, endIndex);
 
-  // Reset to first page when filters change
   useEffect(() => {
     if (searchTerm || dateRange.from || dateRange.to) {
       setIsFiltering(true);
@@ -172,7 +149,6 @@ const VideoGrid = ({ channelId }) => {
     setCurrentPage(1);
   }, [searchTerm, dateRange]);
 
-  // Reset videos when channel changes
   useEffect(() => {
     setAllVideos([]);
     setNextPageToken(null);
@@ -181,21 +157,19 @@ const VideoGrid = ({ channelId }) => {
 
   const handlePageChange = async (page) => {
     setIsPaginating(true);
-    
-    // Check if we need to fetch more videos for unfiltered pagination
+
     if (!hasFilters) {
       const requiredVideos = page * ITEMS_PER_PAGE;
       const availableVideos = allVideos.length;
-      
-      // If we need more videos and have a next page token, fetch them
+
       if (requiredVideos > availableVideos && nextPageToken && uploadsPlaylistId) {
         await fetchMoreVideos(nextPageToken, uploadsPlaylistId);
       }
     }
-    
+
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+
     setTimeout(() => {
       setIsPaginating(false);
     }, 300);
@@ -248,21 +222,21 @@ const VideoGrid = ({ channelId }) => {
   return (
     <div className="space-y-6">
       {channelInfo && <ChannelInfo channelInfo={channelInfo} />}
-      
-      <VideoFilters 
-        searchTerm={searchTerm} 
+
+      <VideoFilters
+        searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         dateRange={dateRange}
         onDateRangeChange={setDateRange}
       />
 
-      <VideoStats 
+      <VideoStats
         filteredCount={filteredVideos.length}
         totalCount={totalChannelVideos}
         currentPage={currentPage}
         totalPages={totalPages}
       />
-      
+
       {isFiltering || isPaginating || isLoadingMoreVideos ? (
         <div className="flex items-center justify-center py-12">
           <div className="flex flex-col items-center space-y-4">
@@ -276,7 +250,7 @@ const VideoGrid = ({ channelId }) => {
         <VideoList videos={currentVideos} />
       )}
 
-      <VideoPagination 
+      <VideoPagination
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}

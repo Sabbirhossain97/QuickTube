@@ -7,7 +7,7 @@ const VideoCard = ({ video }) => {
   const { snippet } = video;
   const videoId = snippet.resourceId.videoId;
   const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
-  
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -21,15 +21,14 @@ const VideoCard = ({ video }) => {
     window.open(videoUrl, "_blank", "noopener,noreferrer");
   };
 
-  // Get the highest quality thumbnail available
-  const thumbnail = snippet.thumbnails.maxres || 
-                   snippet.thumbnails.high || 
-                   snippet.thumbnails.medium || 
-                   snippet.thumbnails.default;
+  const thumbnail = snippet.thumbnails.maxres ||
+    snippet.thumbnails.high ||
+    snippet.thumbnails.medium ||
+    snippet.thumbnails.default;
 
   return (
-    <Card 
-      className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 bg-card border-border"
+    <Card
+      className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 bg-card border rounded-lg"
       onClick={handleCardClick}
     >
       <CardContent className="p-0">
@@ -47,12 +46,12 @@ const VideoCard = ({ video }) => {
             </Badge>
           </div>
         </div>
-        
+
         <div className="p-4 space-y-2">
           <h3 className="font-semibold text-sm line-clamp-2 text-foreground group-hover:text-primary transition-colors duration-200">
             {snippet.title}
           </h3>
-          
+
           <p className="text-xs text-muted-foreground">
             {formatDate(snippet.publishedAt)}
           </p>

@@ -30,9 +30,6 @@ const ChannelInfo = ({ channelInfo }) => {
           <div className="flex-1 space-y-3">
             <div>
               <h2 className="text-2xl font-bold text-foreground">{snippet.title}</h2>
-              <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-                {snippet.description}
-              </p>
             </div>
             
             <div className="flex flex-wrap gap-3">
