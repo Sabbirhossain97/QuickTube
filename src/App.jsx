@@ -1,52 +1,30 @@
-import { useState } from "react";
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Header from "./components/Header";
-import ChannelInput from "./components/ChannelInput";
-import VideoGrid from "./components/VideoGrid";
-import Footer from "./components/Footer";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./components/ThemeProvider";
+import Landing from "./pages/Landing";
+import Browse from "./pages/Browse";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [channelId, setChannelId] = useState("");
-
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="quicktube-theme">
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <div className="min-h-screen bg-background flex flex-col">
-            <Header />
-            <main className="w-full max-w-[1280px] mx-auto px-4 py-20 flex-1">
-              <div className="space-y-8">
-                <div className="text-center space-y-4">
-                  <h1 className="text-4xl font-bold text-foreground">
-                    QuickTube Video Browser
-                  </h1>
-                  <p className="text-lg text-muted-foreground">
-                    Filter and browse YouTube channel videos quickly with advanced search and date filtering
-                  </p>
-                </div>
-
-                <ChannelInput
-                  channelId={channelId}
-                  setChannelId={setChannelId}
-                />
-
-                {channelId && (
-                  <VideoGrid
-                    channelId={channelId}
-                  />
-                )}
-              </div>
-            </main>
-            <Footer />
-          </div>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/browse" element={<Browse />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
