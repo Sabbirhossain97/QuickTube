@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ArrowRight, Search, Filter, Calendar, Youtube, Play, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,8 +29,8 @@ const Landing = () => {
     },
     {
       icon: Youtube,
-      title: "Channel Analytics",
-      description: "Get insights into channel statistics and video performance metrics."
+      title: "Channel Information",
+      description: "View basic channel information including subscriber count, video count, and total views."
     }
   ];
 
@@ -214,7 +213,7 @@ const Landing = () => {
             </Link>
           </Button>
         </div>
-      </section>
+      </Section>
 
       <Footer />
     </div>
